@@ -33,14 +33,14 @@ class MainController extends AbstractController
         //Item is parent class with basic data
         $item = new ItemEntity;
         //Create form for item
-        //This form is for fill new item data and create target for it
+        //This form is for filling new item data and create target for it
         $itemForm = $this->createForm(ItemType::class, $item);
 
         //Create new target
         //Target or buy order is child class, it's content information with price and amount of our buy order
         $target = new TargetEntity;
         //Create form for target
-        //This form is to fill target data for existing item
+        //This form is to filling target data for existing item
         $targetForm = $this->createForm(TargetType::class, $target);
 
         
