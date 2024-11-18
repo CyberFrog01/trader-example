@@ -1,2 +1,2 @@
-Example of basic code
+Example of basic code \n
 Start from MainController :)
