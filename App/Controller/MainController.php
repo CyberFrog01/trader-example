@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\ItemEntityRepository;
 use App\Entity\ItemEntity;
 use App\Entity\TargetEntity;
 use App\Form\ItemType;
@@ -22,8 +23,9 @@ use Symfony\Component\Serializer\Serializer;
 class MainController extends AbstractController
 {
     public function __construct(
-        private EntityManagerInterface $em,
-        private ItemService $is,
+        private EntityManagerInterface $entityManager,
+        private ItemService $itemService,
+        ItemEntityRepository $itemRepository
     ) {
     }
 
@@ -50,16 +52,16 @@ class MainController extends AbstractController
             $item = $itemForm->getData();
             
             //Process item creation in ItemService
-            $item = $this->is->createItem($item);
+            $item = $this->itemService->createItem($item);
             //Save target data
             $target->setItem($item);
             $target->setAmount($item->getMaxAmount());
             $target->setPrice($item->getMaxPrice());
 
             //Save entities to DB
-            $this->em->persist($item);
-            $this->em->persist($target);
-            $this->em->flush();
+            $this->entityManager->persist($item);
+            $this->entityManager->persist($target);
+            $this->entityManager->flush();
 
             return $this->redirectToRoute('create');
         }
@@ -70,11 +72,11 @@ class MainController extends AbstractController
         if ($targetForm->isSubmitted() && $targetForm->isValid()) {
             $target = $targetForm->getData();
             //Process target creation in ItemService
-            $this->is->createTarget($target->getItem(), $target->getAmount(), $target->getPrice());
+            $this->itemService->createTarget($target->getItem(), $target->getAmount(), $target->getPrice());
 
             //Save entities to DB
-            $this->em->persist($item);
-            $this->em->flush();
+            $this->entityManager->persist($item);
+            $this->entityManager->flush();
 
             return $this->redirectToRoute('create');
         }
@@ -87,37 +89,31 @@ class MainController extends AbstractController
     }
 
     #[Route('/csv')]
-    public function convertCSV() {
+    public function createTargetsFromCSV() {
         //Init serializer to decode csv file
         $serializer = new Serializer([new ObjectNormalizer()], [new CsvEncoder()]);
         //You can see test data inside test.csv file
-        $data = $serializer->decode(file_get_contents('test.csv'), 'csv');
+        $targets = $serializer->decode(file_get_contents('test.csv'), 'csv');
         
         //Process data
-        foreach ($data as $d) {
-            //Create an item
-            $item = new ItemEntity;
-            
-            //Fill item with data
-            $item->setTitle($d['Title']);
-            $item->setMaxAmount($d['MaxAmount']);
-            $item->setMaxPrice($d['MaxPrice']);
-            
-            //Process item creation in itemService
-            $item = $this->is->createItem($item);
+        foreach ($targets as $targetData) {
+            //Get item from repository
+            $item = $this->entityManager->getRepository(ItemEntity::class)->findOneBy(['title' => $targetData['title']]);
             
             //Create target and fill it with data
             $target = new TargetEntity;
-            $target->setItem($item);
-            $target->setAmount($item->getMaxAmount());
-            $target->setPrice($item->getMaxPrice());
+            $item->getMarketName()->addTarget($target);
+            $target->setAmount($targetData['amount']);
+            $target->setPrice($targetData['price']);
+            
+            //Process target creation
+            $this->itemService->createTarget($target);
             
             //Save entities to DB
-            $this->em->persist($item);
-            $this->em->persist($target);
-            $this->em->flush();
+            $this->entityManager->persist($item);
+            $this->entityManager->persist($target);
+            $this->entityManager->flush();
         }
         //No render yeet :)
-        dd('peremoga');
     }
 }

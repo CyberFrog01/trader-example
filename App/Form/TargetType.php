@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\ItemEntity;
+use App\Entity\ItemCsEntity;
 use App\Entity\TargetEntity;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -18,7 +18,7 @@ class TargetType extends AbstractType
             ->add('amount')
             ->add('price')
             ->add('item', EntityType::class, [
-                'class' => ItemEntity::class,
+                'class' => ItemCsEntity::class,
                 'choice_label' => 'title',
             ])
             ->add('save', SubmitType::class, ['label' => 'Create target'])

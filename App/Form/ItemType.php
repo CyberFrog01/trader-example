@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\ItemEntity;
+use App\Entity\ItemCsEntity;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -26,7 +26,7 @@ class ItemType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => ItemEntity::class,
+            'data_class' => ItemCsEntity::class,
         ]);
     }
 }

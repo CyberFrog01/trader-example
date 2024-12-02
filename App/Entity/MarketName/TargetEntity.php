@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\MarketName;
 
 use App\Repository\TargetEntityRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,7 +21,7 @@ class TargetEntity
 
     #[ORM\ManyToOne(inversedBy: 'target')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?ItemEntity $item = null;
+    private ?MarketNameEntity $marketName = null;
 
     public function getId(): ?int
     {
@@ -52,14 +52,14 @@ class TargetEntity
         return $this;
     }
 
-    public function getItem(): ?ItemEntity
+    public function getMarketName(): ?MarketNameEntity
     {
-        return $this->item;
+        return $this->marketName;
     }
 
-    public function setItem(?ItemEntity $item): static
+    public function setMarketName(?MarketNameEntity $marketName): static
     {
-        $this->item = $item;
+        $this->marketName = $marketName;
 
         return $this;
     }

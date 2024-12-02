@@ -19,16 +19,16 @@ class ItemService
         //Save data that needed for API request to market
         $item = $this->setItemAdditionalData($item);
         //Create target for item
-        $this->createTarget($item, $item->getMaxAmount(), $item->getMaxPrice());
+        $this->createTarget($item, $item->getAmount(), $item->getPrice());
         //return updated 
         return $item;
     }
 
-    public function createTarget($item, $amount, $price) {
-        //Filling request body with item data
-        $body = $this->buildTargetBodyFromItem($item, $amount, strval($price));
-        //Send requst using RequestService
-        $this->rs->createTargetRequest($body);
+    public function createTarget($target) {
+        //Filling request body with item data and send requst using RequestService
+        $this->rs->createTargetRequest(
+            $this->buildTargetBodyFromItem($target->getItem(), $target->getAmount(), strval($target->getPrice()))
+        );
     }
 
     public function setItemAdditionalData($item) 
